@@ -16,7 +16,9 @@ ip_smartphone = []
 # USER VARIABLES FROM .ini CONFIG FILE
 
 config = configparser.ConfigParser()
-config.read('/home/pi/home_remote3/trunk/settings.ini')
+rf_codes = configparser.ConfigParser()
+config.read('./settings.ini')
+rf_codes.read('./rf_codes.ini')
 
 
 #  logging setting read
@@ -53,9 +55,15 @@ pi3kitchen_ip = config.get('HOME_REMOTE', 'pi3kitchen_ip')
 
 
 # devices
-pi3kitwchen = network.Connecting(pi3kitchen_ip, 1, 1, 1)
-stammen_pink = network.Connecting(stammen_pink_host, 1, 1)  # host will be not used
-stammen_green = network.Connecting(stammen_green_host, 1, 1)  # host will be not used
+pi3kitchen = network.Connecting(pi3kitchen_ip,
+                                 config.get('Codes', 'pi3kitchen_on'),
+                                 config.get('Codes', 'pi3kitchen_off'), 1)
+stammen_pink = network.Connecting(stammen_pink_host,
+                                  config.get('Codes', 'stammen_pink_on'),
+                                  config.get('Codes', 'stammen_pink_off'))  # host will be not used
+stammen_green = network.Connecting(stammen_green_host,
+                                   config.get('Codes', 'stammen_green_on'),
+                                   config.get('Codes', 'stammen_green_off'))  # host will be not used
 omada = network.Connecting(omada_host)
 router = network.Connecting(router_host)
 smartphones = network.Connecting(ip_smartphone)
@@ -101,7 +109,7 @@ def system_on():
                 stammen_pink.off()
                 stammen_green.off()
 
-                pi3kitchen_status = pi3kitchen.check_online()  # proction if signal not sent,
+                pi3kitchen_status = pi3kitchen.check_online()  # protection if signal not sent,
                 #  and electric not down
 
                 if pi3kitchen_status == 0:
