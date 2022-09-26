@@ -16,8 +16,8 @@ class Connecting:
         self.ip_address = ip_address
 
         if rf_on or rf_off:
-            self.rf_on = rf_on
-            self.rf_off = rf_off
+            self.rf_on = int(rf_on)
+            self.rf_off = int(rf_off)
 
         self.shutdown = shutdown
 

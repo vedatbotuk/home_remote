@@ -16,9 +16,9 @@ ip_smartphone = []
 # USER VARIABLES FROM .ini CONFIG FILE
 
 config = configparser.ConfigParser()
-rf_codes = configparser.ConfigParser()
+rf_codes_config = configparser.ConfigParser()
 config.read('./settings.ini')
-rf_codes.read('./rf_codes.ini')
+rf_codes_config.read('./rf_code.ini')
 
 
 #  logging setting read
@@ -29,7 +29,7 @@ if logging_status == "on" or logging_status == "min":
     logging.basicConfig(level=logging.INFO,
                         format="%(asctime)s %(levelname)-8s %(message)s",
                         datefmt='%a, %d %b %Y %H:%M:%S',
-                        filename='/var/log/my_projekts/home_remote.log',
+                        filename='./home_remote.log',
                         )
 
 #  here settings for checkip on/off
@@ -56,14 +56,14 @@ pi3kitchen_ip = config.get('HOME_REMOTE', 'pi3kitchen_ip')
 
 # devices
 pi3kitchen = network.Connecting(pi3kitchen_ip,
-                                 config.get('Codes', 'pi3kitchen_on'),
-                                 config.get('Codes', 'pi3kitchen_off'), 1)
+                                rf_codes_config.get('CODES', 'pi3kitchen_on'),
+                                rf_codes_config.get('CODES', 'pi3kitchen_off'), 1)
 stammen_pink = network.Connecting(stammen_pink_host,
-                                  config.get('Codes', 'stammen_pink_on'),
-                                  config.get('Codes', 'stammen_pink_off'))  # host will be not used
+                                  rf_codes_config.get('CODES', 'stammen_pink_on'),
+                                  rf_codes_config.get('CODES', 'stammen_pink_off'))  # host will be not used
 stammen_green = network.Connecting(stammen_green_host,
-                                   config.get('Codes', 'stammen_green_on'),
-                                   config.get('Codes', 'stammen_green_off'))  # host will be not used
+                                   rf_codes_config.get('CODES', 'stammen_green_on'),
+                                   rf_codes_config.get('CODES', 'stammen_green_off'))  # host will be not used
 omada = network.Connecting(omada_host)
 router = network.Connecting(router_host)
 smartphones = network.Connecting(ip_smartphone)
