@@ -3,6 +3,9 @@
 from time import sleep
 import configparser
 import network as network
+import os
+
+current_dict = os.getcwd()
 
 #  here comes global variables
 c_exception = 0
@@ -17,8 +20,8 @@ ip_smartphone = []
 
 config = configparser.ConfigParser()
 rf_codes_config = configparser.ConfigParser()
-config.read('/home/pi/own_software/home_remote/settings.ini')
-rf_codes_config.read('/home/pi/own_software/home_remote/rf_code.ini')
+config.read(current_dict + '/' + 'settings.ini')
+rf_codes_config.read(current_dict + '/' + 'rf_code.ini')
 
 
 #  logging setting read
@@ -29,7 +32,7 @@ if logging_status == "on" or logging_status == "min":
     logging.basicConfig(level=logging.INFO,
                         format="%(asctime)s %(levelname)-8s %(message)s",
                         datefmt='%a, %d %b %Y %H:%M:%S',
-                        filename='/home/pi/own_software/home_remote/home_remote.log',
+                        filename= current_dict + '/' + 'home_remote.log',
                         )
 
 #  here settings for checkip on/off
