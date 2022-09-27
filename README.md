@@ -26,7 +26,7 @@ sudo raspi-config
   cd home_remote
   sudo cp linux-services/home_remote.service /etc/systemd/system/home_remote.service
   ```
-- Customize path to ```main.py```.
+- Customize path to ```main.py``` and the ```WorkingDirectory```.
   ```bash
   sudo nano /etc/systemd/system/home_remote.service
   ```
