@@ -16,7 +16,7 @@ stammen_green_off = xxx
 - Copy ```home_remote.sevices``` file.
   ```bash
   cd home_remote
-  cp linux-sevices/home_remote.services /etc/systemd/system/home_remote.service
+  sudo cp linux-services/home_remote.service /etc/systemd/system/home_remote.service
   ```
 - Customize path to ```main.py```.
   ```bash
