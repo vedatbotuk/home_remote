@@ -12,6 +12,14 @@ stammen_green_on = xxx
 stammen_green_off = xxx
 ```
 
+### Enable SPI Interface
+```bash
+sudo raspi-config
+```
+- Select ```Interface Options```
+- Select ```SPI```
+- Select ```Enable```
+
 ### Create, enable and start services
 - Copy ```home_remote.sevices``` file.
   ```bash
