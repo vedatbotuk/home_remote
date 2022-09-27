@@ -17,8 +17,8 @@ ip_smartphone = []
 
 config = configparser.ConfigParser()
 rf_codes_config = configparser.ConfigParser()
-config.read('./settings.ini')
-rf_codes_config.read('./rf_code.ini')
+config.read('/home/pi/own_software/home_remote/settings.ini')
+rf_codes_config.read('/home/pi/own_software/home_remote/rf_code.ini')
 
 
 #  logging setting read
@@ -29,7 +29,7 @@ if logging_status == "on" or logging_status == "min":
     logging.basicConfig(level=logging.INFO,
                         format="%(asctime)s %(levelname)-8s %(message)s",
                         datefmt='%a, %d %b %Y %H:%M:%S',
-                        filename='./home_remote.log',
+                        filename='/home/pi/own_software/home_remote/home_remote.log',
                         )
 
 #  here settings for checkip on/off
