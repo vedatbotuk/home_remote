@@ -1,0 +1,9 @@
+[Unit]
+Description=home_remote
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/python3 [PATH to home_remote/main.py]
+
+[Install]
+WantedBy=multi-user.target
