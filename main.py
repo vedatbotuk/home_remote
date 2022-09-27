@@ -5,8 +5,6 @@ import configparser
 import network as network
 import os
 
-current_dict = os.getcwd()
-
 #  here comes global variables
 c_exception = 0
 pi3kitchen_status = 0
@@ -20,8 +18,8 @@ ip_smartphone = []
 
 config = configparser.ConfigParser()
 rf_codes_config = configparser.ConfigParser()
-config.read(current_dict + '/' + 'settings.ini')
-rf_codes_config.read(current_dict + '/' + 'rf_code.ini')
+config.read('settings.ini')
+rf_codes_config.read('rf_code.ini')
 
 
 #  logging setting read
@@ -32,8 +30,9 @@ if logging_status == "on" or logging_status == "min":
     logging.basicConfig(level=logging.INFO,
                         format="%(asctime)s %(levelname)-8s %(message)s",
                         datefmt='%a, %d %b %Y %H:%M:%S',
-                        filename= current_dict + '/' + 'home_remote.log',
+                        filename= 'home_remote.log',
                         )
+
 
 #  here settings for checkip on/off
 ping_cycle = config.getint('HOME_REMOTE', 'ping_cycle')
