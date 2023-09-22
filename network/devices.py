@@ -53,9 +53,12 @@ class Connecting:
 
         self.status = 0  # on/off
         self.reboot_protection = 0
-        self.missed = 1  # because of start log "pi3kitchen is up"
+        self.missed = 0  # because of start log "pi3kitchen is up"
 
     def check_online(self, ping_cycle=1):
+        """
+        If missed goes in if condition.
+        """
         if not isinstance(self.ip_address, list):
 
             if os.system("ping -c 1 -W 1 " + self.ip_address + " > /dev/null 2>&1"):
@@ -93,11 +96,11 @@ class Connecting:
         os.system("wakeonlan -i " + self.macaddress + " " + self.macaddress)
         """
         # TODO: check wakeonlan works with sudo or not!
+        os.system("wakeonlan " + self.macaddress)
         logging_for_me("Send wake-on-LAN package to " + self.macaddress)
-        # os.system("wakeonlan " + self.macaddress)
 
     def shutdown_fn(self):
-        # os.system("/usr/bin/ssh -i ~/.ssh/id_rsa -l " + self.username + " " + self.ip_address)
+        os.system("/usr/bin/ssh -i ~/.ssh/id_rsa -l " + self.username + " " + self.ip_address)
         logging_for_me("Sent shutdown command to: " + self.ip_address)
 
     def on(self):
@@ -138,27 +141,35 @@ class Connecting:
                 sleep(0.1)
         return 0
 
-    def check_autostart(self, ping_cycle=4):
-
+    def check_autostart(self):
+        """
+        If missed goes in if condition.
+        """
         if os.system("ping -c 1 -W 1 " + self.ip_address + " > /dev/null 2>&1"):
-            self.missed += 1
             self.reboot_protection += 1
 
-            if self.reboot_protection == 5 or self.reboot_protection == 10 or self.reboot_protection > 120:
+            if self.reboot_protection == 2 or self.reboot_protection == 10:
                 self.missed = 0
 
             if self.reboot_protection > 120:  # counter reset
                 self.reboot_protection = 0
 
+            # self.missed should stay after if conditions
+            self.missed += 1
+
         else:
             self.status = 1
             self.missed = 0
 
-        if self.missed == ping_cycle:
-            self.off()  # pi3kitchen is off, should just electric off
-            sleep(3)
-            self.on()
+        if self.missed == 5:
+            if self.macaddress is not None:
+                self.wake_on_lan()
+
+            if self.rf_off is not None:
+                self.off()  # pi3kitchen is off, should just electric off
+                sleep(3)
+                self.on()
+
             self.status = 1
-            self.missed += 1  # so that not again goes in this loop  in this loop
 
         return self.status

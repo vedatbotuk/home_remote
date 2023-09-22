@@ -85,7 +85,7 @@ def network_check():
         network_status = 0
 
 
-def wait_for_system_on():
+def wait_for_system_off():
     global debiankammer_status
     global network_status
     global some_one_at_home
@@ -95,7 +95,13 @@ def wait_for_system_on():
         network_check()
         some_one_at_home = smartphones.check_online(ping_cycle)
         if network_status == 1:
+            if not debiankammer.check_autostart():
+                debiankammer_status = 0
+            else:
+                debiankammer_status = 1
+
             if some_one_at_home == 0:
+                logging_for_me("Nobody at home")
                 logging_for_me(">>> System goes off >>>")
                 logging_for_me("debian-kammer and stammen go down")
                 debiankammer_status = debiankammer.off()
@@ -112,7 +118,7 @@ def wait_for_system_on():
         sleep(5)
 
 
-def wait_for_system_off():
+def wait_for_system_on():
     global debiankammer_status
     global network_status
     global some_one_at_home
@@ -159,13 +165,13 @@ def system_start():
         logging_for_me("Network status: OFF")
 
     if some_one_at_home == 1:
-        logging_for_me("System status: ON -> Someone at home")
+        logging_for_me("Someone at home")
         if debiankammer_status == 0:
             logging_for_me("debian-kammer is down")
             logging_for_me("debian-kammer goes on")
             debiankammer.on()
         else:
-            logging_for_me("debian-kammer is running")
+            logging_for_me("debian-kammer is already up")
 
     else:
         logging_for_me("System status: OFF -> Nobody at home")
@@ -184,11 +190,11 @@ if __name__ == "__main__":
         try:
             sleep(0.2)
             if some_one_at_home == 1:
-                wait_for_system_on()
+                wait_for_system_off()
 
             sleep(0.2)
             if some_one_at_home == 0:
-                wait_for_system_off()
+                wait_for_system_on()
 
         except Exception as e:
             logging.error(">>>Exception>>>")
