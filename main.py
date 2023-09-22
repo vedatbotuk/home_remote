@@ -3,11 +3,10 @@
 from time import sleep
 import configparser
 import network as network
-import os
 
 #  here comes global variables
 c_exception = 0
-pi3kitchen_status = 0
+debiankammer_status = 0
 network_status = 0
 some_one_at_home = 0
 ip_smartphone = []
@@ -30,7 +29,7 @@ if logging_status == "on" or logging_status == "min":
     logging.basicConfig(level=logging.INFO,
                         format="%(asctime)s %(levelname)-8s %(message)s",
                         datefmt='%a, %d %b %Y %H:%M:%S',
-                        filename= 'home_remote.log',
+                        filename='home_remote.log',
                         )
 
 
@@ -49,23 +48,23 @@ except configparser.NoOptionError:
 
 router_host = config.get('HOME_REMOTE', 'router_host')
 omada_host = config.get('HOME_REMOTE', 'omada_host')
-stammen_pink_host = config.get('HOME_REMOTE', 'stammen_pink_host')
-stammen_green_host = config.get('HOME_REMOTE', 'stammen_green_host')
-pi3kitchen_ip = config.get('HOME_REMOTE', 'pi3kitchen_ip')
+# stammen_pink_host = config.get('HOME_REMOTE', 'stammen_pink_host')
+# stammen_green_host = config.get('HOME_REMOTE', 'stammen_green_host')
+debiankammer_ip = config.get('HOME_REMOTE', 'debiankammer_ip')
+debiankammer_mac = config.get('HOME_REMOTE', 'debiankammer_mac')
+debiankammer_username = config.get('HOME_REMOTE', 'debiankammer_username')
 
 # settings read end
 
 
 # devices
-pi3kitchen = network.Connecting(pi3kitchen_ip,
-                                rf_codes_config.get('CODES', 'pi3kitchen_on'),
-                                rf_codes_config.get('CODES', 'pi3kitchen_off'), 1)
-stammen_pink = network.Connecting(stammen_pink_host,
-                                  rf_codes_config.get('CODES', 'stammen_pink_on'),
-                                  rf_codes_config.get('CODES', 'stammen_pink_off'))  # host will be not used
-stammen_green = network.Connecting(stammen_green_host,
-                                   rf_codes_config.get('CODES', 'stammen_green_on'),
-                                   rf_codes_config.get('CODES', 'stammen_green_off'))  # host will be not used
+debiankammer = network.Connecting(ip_address=debiankammer_ip, macaddress=debiankammer_mac, username=debiankammer_username)
+# stammen_pink = network.Connecting(stammen_pink_host,
+#                                   rf_codes_config.get('CODES', 'stammen_pink_on'),
+#                                   rf_codes_config.get('CODES', 'stammen_pink_off'))  # host will be not used
+# stammen_green = network.Connecting(stammen_green_host,
+#                                    rf_codes_config.get('CODES', 'stammen_green_on'),
+#                                    rf_codes_config.get('CODES', 'stammen_green_off'))  # host will be not used
 omada = network.Connecting(omada_host)
 router = network.Connecting(router_host)
 smartphones = network.Connecting(ip_smartphone)
@@ -86,126 +85,97 @@ def network_check():
         network_status = 0
 
 
-def system_on():
-    global pi3kitchen_status
+def wait_for_system_on():
+    global debiankammer_status
     global network_status
     global some_one_at_home
 
     while True:
-        sys_state = 0
-        sleep(0.2)
+        sys_state = 1
         network_check()
-        if network_status == 1:
-            pi3kitchen_status = pi3kitchen.check_autostart()
-
         some_one_at_home = smartphones.check_online(ping_cycle)
-        for x in range(150):
-            sleep(0.2)
+        if network_status == 1:
             if some_one_at_home == 0:
-                logging_for_me("")
-                logging_for_me(">>> system goes off >>>")
+                logging_for_me(">>> System goes off >>>")
+                logging_for_me("debian-kammer and stammen go down")
+                debiankammer_status = debiankammer.off()
 
-                logging_for_me("pi3kitchen and stammen go down")
-
-                pi3kitchen_status = pi3kitchen.off()
-                stammen_pink.off()
-                stammen_green.off()
-
-                pi3kitchen_status = pi3kitchen.check_online()  # protection if signal not sent,
-                #  and electric not down
-
-                if pi3kitchen_status == 0:
-                    sys_state = 1
-                    break
+                if debiankammer_status == 0:
+                    sys_state = 0
                 else:
-                    logging_for_me("system off not completed")
+                    logging_for_me("System off not completed")
                     sleep(3)
 
-        if sys_state == 1:
-            logging_for_me("<<< system goes off <<<")
-            sleep(3)
+        if sys_state == 0:
+            logging_for_me("<<< System goes off <<<")
             break
+        sleep(5)
 
 
-def system_off():
-    global pi3kitchen_status
+def wait_for_system_off():
+    global debiankammer_status
     global network_status
     global some_one_at_home
 
     while True:
         sys_state = 0
         network_check()
-        some_one_at_home = smartphones.check_online(ping_cycle)
-        sleep(0.2)
-        for x in range(150):
-            sleep(0.2)
+        some_one_at_home = smartphones.check_online()
+        if network_status == 1:
             if some_one_at_home == 1:
-
-                sleep(0.1)
-
-                logging_for_me("")
-                logging_for_me(">>> system goes on >>>")
-
-                pi3kitchen_status = pi3kitchen.on()
-                stammen_pink.on()
-                stammen_green.on()
-
-                logging_for_me("pi3kitchen and stammen starting")
-
-                sleep(5)
                 sys_state = 1
-                break
+                logging_for_me(">>> System goes on >>>")
+                debiankammer_status = debiankammer.on()
+                logging_for_me("debian-kammer goes on")
+            else:
+                logging_for_me("Nobody at home")
+        else:
+            logging_for_me("Network status: OFF")
 
         if sys_state == 1:
-            logging_for_me("<<< system goes on <<<")
-            logging_for_me("")
-            sleep(3)
+            logging_for_me("<<< System goes on <<<")
             break
+
+        sleep(5)
 
 
 def system_start():
     global some_one_at_home
-    global pi3kitchen_status
+    global debiankammer_status
     global network_status
 
     logging.info("")
     logging.info("START SYSTEM")
 
-    sleep(20)  # reboot waiting because of network
+    # sleep(20)  # reboot waiting because of network
 
     network_check()
 
     if network_status == 1:
-        pi3kitchen_status = pi3kitchen.check_online()  # check pi3kitchen. important for switch off
+        logging_for_me("Network status: ON")
+        debiankammer_status = debiankammer.check_online()  # check debian-kammer. important for switch off
         some_one_at_home = smartphones.check_online()
+    else:
+        logging_for_me("Network status: OFF")
 
-    if some_one_at_home == 1:  # is switch on
-        logging_for_me("system status on")
-        if pi3kitchen_status == 0:
-            logging_for_me("pi3kitchen is down")
+    if some_one_at_home == 1:
+        logging_for_me("System status: ON -> Someone at home")
+        if debiankammer_status == 0:
+            logging_for_me("debian-kammer is down")
+            logging_for_me("debian-kammer goes on")
+            debiankammer.on()
+        else:
+            logging_for_me("debian-kammer is running")
 
-        logging_for_me("pi3kitchen and stammen sockets go on")
-        pi3kitchen.on()
-        stammen_pink.on()
-        stammen_green.on()
-
-        logging_for_me("")
-
-    else:  # switch off
-        logging_for_me("system status off")
-        if pi3kitchen_status == 1:
-            pi3kitchen_status = pi3kitchen.off()
-            logging_for_me("pi3kitchen goes down")
-
-        pi3kitchen.off(socket=1)  # if steckdose on, and pi3kitchen off, protection off
-        stammen_pink.off()
-        stammen_green.off()
-        logging_for_me("pi3kitchen and stammen sockets go off")
-        logging_for_me("")
+    else:
+        logging_for_me("System status: OFF -> Nobody at home")
+        if debiankammer_status == 1:
+            logging_for_me("debian-kammer activ")
+            logging_for_me("debian-kammer should go down")
+            debiankammer.off()
 
 
 # here start the main ####
-
 if __name__ == "__main__":
 
     system_start()
@@ -214,11 +184,11 @@ if __name__ == "__main__":
         try:
             sleep(0.2)
             if some_one_at_home == 1:
-                system_on()
+                wait_for_system_on()
 
             sleep(0.2)
             if some_one_at_home == 0:
-                system_off()
+                wait_for_system_off()
 
         except Exception as e:
             logging.error(">>>Exception>>>")
