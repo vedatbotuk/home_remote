@@ -115,7 +115,7 @@ def wait_for_system_off():
         if sys_state == 0:
             logging_for_me("<<< System goes off <<<")
             break
-        sleep(5)
+        sleep(30)
 
 
 def wait_for_system_on():
@@ -140,7 +140,7 @@ def wait_for_system_on():
             logging_for_me("<<< System goes on <<<")
             break
 
-        sleep(5)
+        sleep(30)
 
 
 def system_start():
@@ -183,6 +183,7 @@ def system_start():
 if __name__ == "__main__":
 
     system_start()
+    sleep(30)
 
     while True:
         try:
