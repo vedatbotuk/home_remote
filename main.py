@@ -133,8 +133,6 @@ def wait_for_system_on():
                 logging_for_me(">>> System goes on >>>")
                 debiankammer_status = debiankammer.on()
                 logging_for_me("debian-kammer goes on")
-            else:
-                logging_for_me("Nobody at home")
         else:
             logging_for_me("Network status: OFF")
 
