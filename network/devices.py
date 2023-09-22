@@ -100,7 +100,7 @@ class Connecting:
         logging_for_me("Send wake-on-LAN package to " + self.macaddress)
 
     def shutdown_fn(self):
-        os.system("/usr/bin/ssh -i ~/.ssh/id_rsa -l " + self.username + " " + self.ip_address)
+        os.system("sudo -u pi /usr/bin/ssh -i ~/.ssh/id_rsa -l " + self.username + " " + self.ip_address + " > /dev/null")
         logging_for_me("Sent shutdown command to: " + self.ip_address)
 
     def on(self):
